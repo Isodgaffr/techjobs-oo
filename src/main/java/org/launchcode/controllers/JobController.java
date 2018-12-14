@@ -6,6 +6,7 @@ import org.launchcode.models.data.JobData;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.Errors;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
@@ -48,20 +49,19 @@ public class JobController {
             return "new-job";
 
         }
+        else {
+            Job newJob = new Job(
+                    jobForm.getName(),
+                    jobData.getEmployers().findById(jobForm.getEmployerId()),
+                    jobData.getLocations().findById(jobForm.getLocationId()),
+                    jobData.getPositionTypes().findById(jobForm.getPositionTypeId()),
+                    jobData.getCoreCompetencies().findById(jobForm.getCoreCompetenciesId())
+                    );
+            jobData.add(newJob);
 
-        String jobName = jobForm.getName();
-        Employer jobEmp = jobData.getEmployers().findById(jobForm.getEmployerId());
-        Location jobLoc = jobData.getLocations().findById(jobForm.getLocationId());
-        PositionType jobPos = jobData.getPositionTypes().findById(jobForm.getPositionTypeId());
-        CoreCompetency jobComp = jobData.getCoreCompetencies().findById(jobForm.getCoreCompetenciesId());
+            model.addAttribute("job", newJob);
 
-        Job newJob = new Job(jobName, jobEmp, jobLoc, jobPos, jobComp);
-
-        jobData.add(newJob);
-
-        model.addAttribute("id", newJob.getId());
-
-        return "redirect:/job";
-
+            return "redirect:/job?id=" + newJob.getId();
+        }
     }
 }
